@@ -56,12 +56,12 @@ button:hover{background:var(--bg-sec)}button:active{transform:scale(.98)}
 .card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
 .metric{background:var(--bg-sec);border-radius:var(--radius);padding:.875rem;text-align:center}
 .ml{font-size:11px;color:var(--text-sec);margin-bottom:3px}
-.mv{font-size:18px;font-weight:500}
+.mv{font-size:17px;font-weight:500}
 .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
 .bok{background:var(--green-light);color:var(--green)}
 .bpd{background:var(--amber-light);color:var(--amber-dark)}
 .ber{background:var(--red-light);color:var(--red)}
-.topbar{background:var(--bg-card);border-bottom:0.5px solid var(--border);padding:6px 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;min-height:52px}
+.topbar{background:var(--bg-card);border-bottom:0.5px solid var(--border);padding:0 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;height:56px}
 .avatar{width:32px;height:32px;border-radius:50%;background:#1B3A6B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:8px 10px;color:var(--text-sec);font-weight:400;border-bottom:0.5px solid var(--border)}
@@ -85,17 +85,18 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 .mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:1rem}
 .mbg.open{display:flex}
 .modal{background:var(--bg-card);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:460px;border:0.5px solid var(--border)}
-/* Logo inline */
-.logo svg{display:block}
-.ult-atualizacao{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-sec);border-radius:var(--radius);font-size:12px;color:var(--text-sec);margin-bottom:1rem}
-.ult-atualizacao strong{color:var(--text)}
+.ult-at{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-sec);border-radius:var(--radius);font-size:12px;color:var(--text-sec);margin-bottom:1rem}
+.ult-at strong{color:var(--text)}
+/* Logo — tamanho fixo, nunca cresce */
+.logo-topbar{display:block;flex-shrink:0}
+.senha-cell{font-family:monospace;font-size:12px;letter-spacing:1px;color:var(--text-sec)}
 @media(max-width:480px){.fr{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div id="toast"></div>
 
-<!-- Modal Edição -->
+<!-- Modal Edição de Frete -->
 <div class="mbg" id="mbg">
   <div class="modal">
     <div style="font-weight:500;font-size:15px;margin-bottom:1rem">Editar frete</div>
@@ -115,26 +116,28 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 
 <!-- Loading -->
 <div id="ls">
-  <svg viewBox="0 0 200 52" width="180" height="46" xmlns="http://www.w3.org/2000/svg">
-    <text x="0" y="40" font-size="44" font-weight="900" font-family="Arial Black,Arial,sans-serif">
-      <tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">NDR</tspan><tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">D</tspan><tspan fill="#D0201A">E</tspan>
-    </text>
-    <text x="56" y="50" font-size="10.5" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="3">FRETES</text>
-  </svg>
+  <div style="text-align:center">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 70" width="220" height="60" style="display:block;margin:0 auto">
+      <text y="52" font-size="58" font-weight="900" font-family="Arial Black,Arial,sans-serif" x="2">
+        <tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">NDR</tspan><tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">D</tspan><tspan fill="#D0201A">E</tspan>
+      </text>
+      <text x="74" y="66" font-size="11" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="3.5">FRETES</text>
+    </svg>
+  </div>
   <div><span class="spin" style="width:20px;height:20px;border-width:3px"></span><span style="font-size:13px;color:var(--text-sec)">Conectando...</span></div>
 </div>
 
 <!-- LOGIN -->
 <div id="page-login" class="page">
-  <div style="max-width:360px;margin:3rem auto;padding:0 1rem">
-    <div style="text-align:center;margin-bottom:1.75rem">
-      <svg viewBox="0 0 200 58" width="190" height="55" xmlns="http://www.w3.org/2000/svg" style="margin:0 auto;display:block">
-        <text x="0" y="44" font-size="48" font-weight="900" font-family="Arial Black,Arial,sans-serif">
+  <div style="max-width:360px;margin:0 auto;padding:3rem 1rem 2rem">
+    <div style="text-align:center;margin-bottom:2rem">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 70" width="220" height="60" style="display:block;margin:0 auto 12px">
+        <text y="52" font-size="58" font-weight="900" font-family="Arial Black,Arial,sans-serif" x="2">
           <tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">NDR</tspan><tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">D</tspan><tspan fill="#D0201A">E</tspan>
         </text>
-        <text x="56" y="56" font-size="11" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="3">FRETES</text>
+        <text x="74" y="66" font-size="11" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="3.5">FRETES</text>
       </svg>
-      <p style="font-size:12px;color:var(--text-sec);margin-top:6px">Controle de fretes em tempo real</p>
+      <p style="font-size:12px;color:var(--text-sec)">Controle de fretes em tempo real</p>
     </div>
     <div class="card">
       <div id="la"></div>
@@ -149,11 +152,12 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 <!-- MOTORISTA -->
 <div id="page-motorista" class="page">
   <div class="topbar">
-    <svg viewBox="0 0 155 34" width="120" height="26" xmlns="http://www.w3.org/2000/svg">
-      <text x="0" y="26" font-size="30" font-weight="900" font-family="Arial Black,Arial,sans-serif">
+    <!-- Logo topbar: viewBox exato, width/height controlados -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 52" width="115" height="28" class="logo-topbar">
+      <text y="38" font-size="42" font-weight="900" font-family="Arial Black,Arial,sans-serif" x="2">
         <tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">NDR</tspan><tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">D</tspan><tspan fill="#D0201A">E</tspan>
       </text>
-      <text x="42" y="33" font-size="8.5" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="2.2">FRETES</text>
+      <text x="58" y="50" font-size="9" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="3">FRETES</text>
     </svg>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="avatar" id="mav">MO</div>
@@ -171,12 +175,18 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
       <div class="metric"><div class="ml">Pendente</div><div class="mv" id="mpd" style="color:var(--amber-dark)">—</div></div>
       <div class="metric"><div class="ml">Total geral</div><div class="mv" id="mtg">—</div></div>
     </div>
-    <div class="ult-atualizacao" id="ult-at" style="display:none">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <div class="ult-at" id="ult-at" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>Última atualização: <strong id="ult-at-txt">—</strong></span>
     </div>
     <div class="card">
-      <div style="font-weight:500;margin-bottom:12px">Histórico de fretes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <span style="font-weight:500">Histórico de fretes</span>
+        <button onclick="pdfMotorista()" style="font-size:12px;padding:5px 12px;display:flex;align-items:center;gap:5px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          Exportar PDF
+        </button>
+      </div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:110px"><label>De</label><input type="date" id="mfd" onchange="renderMot()"></div>
         <div style="flex:1;min-width:110px"><label>Até</label><input type="date" id="mfa" onchange="renderMot()"></div>
@@ -195,11 +205,11 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 <!-- GERENTE -->
 <div id="page-gerente" class="page">
   <div class="topbar">
-    <svg viewBox="0 0 155 34" width="120" height="26" xmlns="http://www.w3.org/2000/svg">
-      <text x="0" y="26" font-size="30" font-weight="900" font-family="Arial Black,Arial,sans-serif">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 52" width="115" height="28" class="logo-topbar">
+      <text y="38" font-size="42" font-weight="900" font-family="Arial Black,Arial,sans-serif" x="2">
         <tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">NDR</tspan><tspan fill="#D0201A">A</tspan><tspan fill="#1B3A6B">D</tspan><tspan fill="#D0201A">E</tspan>
       </text>
-      <text x="42" y="33" font-size="8.5" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="2.2">FRETES</text>
+      <text x="58" y="50" font-size="9" font-weight="700" fill="#1B3A6B" font-family="Arial,sans-serif" letter-spacing="3">FRETES</text>
     </svg>
     <div style="display:flex;align-items:center;gap:6px">
       <div class="avatar" style="background:var(--green);color:var(--green-light)">GE</div>
@@ -244,7 +254,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
         <div id="cpv"></div><div id="cal"></div>
         <button class="bg" id="bim" style="display:none" onclick="importCSV()">Importar registros</button>
         <div style="margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border)">
-          <p style="font-size:12px;color:var(--text-sec);margin-bottom:6px">Baixar modelo de fretes:</p>
+          <p style="font-size:12px;color:var(--text-sec);margin-bottom:6px">Baixar modelo:</p>
           <button onclick="dlModeloFretes()" style="font-size:12px">Baixar modelo_fretes.csv</button>
         </div>
       </div>
@@ -263,7 +273,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
       <!-- IMPORTAR MOTORISTAS EM MASSA -->
       <div class="card">
         <div style="font-weight:500;margin-bottom:8px">Importar motoristas em massa (CSV)</div>
-        <p style="font-size:13px;color:var(--text-sec);margin-bottom:1rem">Colunas obrigatórias: <code style="font-size:12px;background:var(--bg-sec);padding:1px 5px;border-radius:4px">nome, usuario, senha, telefone</code></p>
+        <p style="font-size:13px;color:var(--text-sec);margin-bottom:1rem">Colunas: <code style="font-size:12px;background:var(--bg-sec);padding:1px 5px;border-radius:4px">nome, usuario, senha, telefone</code></p>
         <div style="border:1.5px dashed var(--border-med);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem">
           <p style="font-size:13px;color:var(--text-sec);margin-bottom:8px">Selecione sua planilha .csv</p>
           <input type="file" id="cmf" accept=".csv" style="display:none" onchange="prevMots(event)">
@@ -272,11 +282,12 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
         <div id="cmpv"></div><div id="cmal"></div>
         <button class="bg" id="bcmi" style="display:none" onclick="importMots()">Cadastrar todos</button>
         <div style="margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border)">
-          <p style="font-size:12px;color:var(--text-sec);margin-bottom:6px">Baixar modelo de motoristas:</p>
+          <p style="font-size:12px;color:var(--text-sec);margin-bottom:6px">Baixar modelo:</p>
           <button onclick="dlModeloMots()" style="font-size:12px">Baixar modelo_motoristas.csv</button>
         </div>
       </div>
 
+      <!-- LISTA MOTORISTAS -->
       <div class="card">
         <div style="font-weight:500;margin-bottom:1rem">Motoristas cadastrados</div>
         <div id="lm2"><div class="spin"></div></div>
@@ -342,6 +353,7 @@ function logout(){if(unsub){unsub();unsub=null;}CU=null;AFs=[];document.getEleme
 async function loadData(){
   const[ms,fs]=await Promise.all([fns.getDocs(fns.collection(db,'motoristas')),fns.getDocs(fns.collection(db,'fretes'))]);
   AMs=ms.docs.map(d=>({id:d.id,...d.data()}));
+  AMs.sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   AFs=fs.docs.map(d=>({id:d.id,...d.data()}));
   AFs.sort((a,b)=>b.data.localeCompare(a.data));
 }
@@ -366,11 +378,10 @@ function initM(mo){
   document.getElementById('mqm').textContent=mf.length;
   document.getElementById('mpd').textContent=R(AFs.filter(f=>f.motId===mo.id&&f.status==='pendente').reduce((s,f)=>s+f.valor,0));
   document.getElementById('mtg').textContent=R(AFs.filter(f=>f.motId===mo.id).reduce((s,f)=>s+f.valor,0));
-  // Última atualização
-  const meusFr=AFs.filter(f=>f.motId===mo.id&&f.criadoEm);
-  if(meusFr.length){
-    meusFr.sort((a,b)=>new Date(b.criadoEm)-new Date(a.criadoEm));
-    document.getElementById('ult-at-txt').textContent=fmtDH(meusFr[0].criadoEm);
+  const mf2=AFs.filter(f=>f.motId===mo.id&&f.criadoEm);
+  if(mf2.length){
+    mf2.sort((a,b)=>new Date(b.criadoEm)-new Date(a.criadoEm));
+    document.getElementById('ult-at-txt').textContent=fmtDH(mf2[0].criadoEm);
     document.getElementById('ult-at').style.display='flex';
   }
   const fim=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).toISOString().slice(0,10);
@@ -391,6 +402,70 @@ function renderMot(){
   el.innerHTML=h;
 }
 function clearFM(){document.getElementById('mfd').value='';document.getElementById('mfa').value='';document.getElementById('mfs').value='';renderMot();}
+
+// PDF DO MOTORISTA
+function pdfMotorista(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const mo=CU.mot;
+  const de=document.getElementById('mfd').value,at=document.getElementById('mfa').value,st=document.getElementById('mfs').value;
+  let fr=AFs.filter(f=>f.motId===mo.id);
+  if(de)fr=fr.filter(f=>f.data>=de);if(at)fr=fr.filter(f=>f.data<=at);if(st)fr=fr.filter(f=>f.status===st);
+  // Cabeçalho
+  doc.setFillColor(27,58,107);doc.rect(0,0,210,18,'F');
+  doc.setFillColor(208,32,26);doc.rect(0,18,210,4,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');
+  doc.text('ANDRADE FRETES',14,12);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');
+  doc.text('Comprovante de Fretes',14,16.5);
+  doc.text('Gerado em: '+new Date().toLocaleString('pt-BR'),210-14,12,{align:'right'});
+  // Info motorista
+  doc.setTextColor(30,30,30);doc.setFontSize(10);doc.setFont('helvetica','bold');
+  doc.text('Motorista: '+mo.nome,14,28);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  doc.text('Período: '+(de?fd(de):'início')+' a '+(at?fd(at):'hoje')+(st?' | Status: '+st:''),14,34);
+  // Métricas
+  const pg=fr.filter(f=>f.status==='pago').reduce((s,f)=>s+f.valor,0);
+  const pd=fr.filter(f=>f.status==='pendente').reduce((s,f)=>s+f.valor,0);
+  [['Total pago',R(pg),'ok'],['Total pendente',R(pd),'pd'],['Qtd. fretes',String(fr.length),'']].forEach(([l,v,tp],i)=>{
+    const x=14+i*62;doc.setFillColor(241,239,232);doc.roundedRect(x,38,58,14,2,2,'F');
+    doc.setFontSize(7.5);doc.setTextColor(95,94,90);doc.text(l,x+4,44);
+    doc.setFontSize(10);doc.setFont('helvetica','bold');
+    doc.setTextColor(tp==='ok'?59:tp==='pd'?154:30,tp==='ok'?109:tp==='pd'?99:30,tp==='ok'?17:tp==='pd'?11:30);
+    doc.text(v,x+4,51);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
+  });
+  // Tabela
+  const cols=[{h:'Data',w:24},{h:'Origem',w:36},{h:'Destino',w:36},{h:'Valor',w:30},{h:'Status',w:22},{h:'Obs',w:48}];
+  let y=58,cx=14;
+  doc.setFillColor(27,58,107);doc.rect(14,y,cols.reduce((s,c)=>s+c.w,0),7,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  cols.forEach(c=>{doc.text(c.h,cx+2,y+5);cx+=c.w;});y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+  fr.forEach((f,i)=>{
+    if(y>275){doc.addPage();y=15;}
+    doc.setFillColor(i%2===0?255:248,248,248);doc.rect(14,y,cols.reduce((s,c)=>s+c.w,0),6,'F');
+    doc.setTextColor(30,30,30);cx=14;
+    [fd(f.data),f.origem,f.destino,R(f.valor),f.status==='pago'?'Pago':'Pendente',f.obs||''].forEach((v,ci)=>{
+      if(ci===4)doc.setTextColor(f.status==='pago'?59:154,f.status==='pago'?109:99,f.status==='pago'?17:11);
+      else doc.setTextColor(30,30,30);
+      doc.text((doc.splitTextToSize(String(v),cols[ci].w-3)[0]||''),cx+2,y+4.5);cx+=cols[ci].w;
+    });y+=6;
+  });
+  // Assinatura
+  y+=10;if(y>265)doc.addPage();
+  doc.setDrawColor(180,180,180);doc.line(14,y,100,y);
+  doc.setFontSize(8);doc.setTextColor(120,120,120);
+  doc.text('Assinatura do motorista',14,y+5);
+  // Rodapé
+  for(let i=1;i<=doc.internal.getNumberOfPages();i++){
+    doc.setPage(i);doc.setFillColor(27,58,107);doc.rect(0,287,210,10,'F');
+    doc.setTextColor(200,210,230);doc.setFontSize(6.5);
+    doc.text('Andrade Fretes — Sistema de Controle de Fretes',14,293);
+    doc.text('Pág. '+i+'/'+doc.internal.getNumberOfPages(),210-14,293,{align:'right'});
+  }
+  doc.save('andrade-fretes-'+mo.nome.split(' ')[0].toLowerCase()+'.pdf');
+  toast('PDF gerado!');
+}
+
 function initG(){popSel();document.getElementById('lda').value=tod();renderMs();renderRel();}
 function popSel(){
   ['lm','rm','em'].forEach(id=>{
@@ -457,14 +532,37 @@ async function addMot(){
   setBtn('bc',true,'Cadastrar');
   try{
     const ref=await fns.addDoc(fns.collection(db,'motoristas'),{nome:nm,usuario:us,senha:sn,tel:tl,criadoEm:new Date().toISOString()});
-    AMs.push({id:ref.id,nome:nm,usuario:us,senha:sn,tel:tl});popSel();renderMs();
+    AMs.push({id:ref.id,nome:nm,usuario:us,senha:sn,tel:tl});
+    AMs.sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+    popSel();renderMs();
     ['cn','cu','cs','ct'].forEach(id=>document.getElementById(id).value='');
     showA('ca','Motorista cadastrado!','ok');
   }catch(e){showA('ca','Erro: '+e.message,'er');}
   setBtn('bc',false,'Cadastrar');
 }
+function renderMs(){
+  const el=document.getElementById('lm2');
+  if(!AMs.length){el.innerHTML='<p style="color:var(--text-sec);font-size:13px">Nenhum motorista cadastrado.</p>';return;}
+  let h='<div class="ox"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Senha</th><th>Telefone</th><th>Fretes</th><th></th></tr></thead><tbody>';
+  AMs.forEach(m=>{
+    h+='<tr>'
+     +'<td>'+m.nome+'</td>'
+     +'<td style="font-family:monospace;font-size:12px">'+m.usuario+'</td>'
+     +'<td class="senha-cell">'+m.senha+'</td>'
+     +'<td style="font-size:12px">'+(m.tel||'—')+'</td>'
+     +'<td>'+AFs.filter(f=>f.motId===m.id).length+'</td>'
+     +'<td><button onclick="delMot(\''+m.id+'\')" style="font-size:11px;padding:3px 8px;color:var(--red);border-color:var(--red-light)">Remover</button></td>'
+     +'</tr>';
+  });
+  el.innerHTML=h+'</tbody></table></div>';
+}
+async function delMot(id){
+  if(!confirm('Remover motorista? Os fretes dele não serão deletados.'))return;
+  try{await fns.deleteDoc(fns.doc(db,'motoristas',id));AMs=AMs.filter(m=>m.id!==id);popSel();renderMs();}
+  catch(e){alert('Erro: '+e.message);}
+}
 
-// Importar motoristas em massa
+// Importar motoristas
 function prevMots(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
@@ -477,11 +575,11 @@ function prevMots(e){
       const p=lines[i].split(',').map(x=>x.trim());if(p.length<3)continue;
       const nm=p[ci.nome]||'',us=(p[ci.usuario]||'').toLowerCase().replace(/\s/g,''),sn=p[ci.senha]||'',tl=p[ci.telefone]||'';
       const dup=AMs.find(m=>m.usuario===us);
-      const ok=nm&&us&&sn.length>=4&&!dup;
+      const ok=!!(nm&&us&&sn.length>=4&&!dup);
       if(!ok)erros++;
-      CSVm.push({ok,nm,us,sn,tl,motivo:!nm?'sem nome':!us?'sem usuário':sn.length<4?'senha curta':dup?'usuário duplicado':''});
+      CSVm.push({ok,nm,us,sn,tl,motivo:!nm?'sem nome':!us?'sem usuário':sn.length<4?'senha curta':dup?'duplicado':''});
     }
-    let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVm.length+' registros'+(erros?' — <span style="color:var(--red)">'+erros+' com problema</span>':' — tudo certo')+'</p>';
+    let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVm.length+' registros'+(erros?' — <span style="color:var(--red)">'+erros+' com problema</span>':' — tudo OK')+'</p>';
     h+='<div class="ox"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Telefone</th><th></th></tr></thead><tbody>';
     CSVm.forEach(r=>{h+='<tr><td>'+r.nm+'</td><td style="font-family:monospace;font-size:12px">'+r.us+'</td><td style="font-size:12px">'+(r.tl||'—')+'</td><td><span class="badge '+(r.ok?'bok':'ber')+'">'+(r.ok?'OK':r.motivo)+'</span></td></tr>';});
     document.getElementById('cmpv').innerHTML=h+'</tbody></table></div>';
@@ -498,6 +596,7 @@ async function importMots(){
       AMs.push({id:ref.id,nome:r.nm,usuario:r.us,senha:r.sn,tel:r.tl});ok++;
     }catch(e){fail++;}
   }
+  AMs.sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
   popSel();renderMs();
   showA('cmal',ok+' motoristas cadastrados!'+(fail?' '+fail+' falharam.':''),'ok');
   document.getElementById('cmpv').innerHTML='';document.getElementById('cmf').value='';CSVm=[];
@@ -505,24 +604,12 @@ async function importMots(){
   toast(ok+' motoristas importados!');
 }
 function dlModeloMots(){
-  const csv='nome,usuario,senha,telefone\nJoao Silva,joaosilva,1234,(81)99001-0001\nMaria Santos,mariasantos,1234,(81)99001-0002\nCarlos Lima,carloslima,1234,(81)99001-0003';
+  const csv='nome,usuario,senha,telefone\nJoao Silva,joaosilva,1234,(81)99001-0001\nMaria Santos,mariasantos,1234,(81)99001-0002';
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='modelo_motoristas.csv';a.click();
 }
 
-function renderMs(){
-  const el=document.getElementById('lm2');
-  if(!AMs.length){el.innerHTML='<p style="color:var(--text-sec);font-size:13px">Nenhum motorista cadastrado.</p>';return;}
-  let h='<div class="ox"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Telefone</th><th>Fretes</th><th></th></tr></thead><tbody>';
-  AMs.forEach(m=>{h+='<tr><td>'+m.nome+'</td><td style="font-family:monospace;font-size:12px">'+m.usuario+'</td><td style="font-size:12px">'+(m.tel||'—')+'</td><td>'+AFs.filter(f=>f.motId===m.id).length+'</td><td><button onclick="delMot(\''+m.id+'\')" style="font-size:11px;padding:3px 8px;color:var(--red);border-color:var(--red-light)">Remover</button></td></tr>';});
-  el.innerHTML=h+'</tbody></table></div>';
-}
-async function delMot(id){
-  if(!confirm('Remover motorista? Os fretes dele não serão deletados.'))return;
-  try{await fns.deleteDoc(fns.doc(db,'motoristas',id));AMs=AMs.filter(m=>m.id!==id);popSel();renderMs();}
-  catch(e){alert('Erro: '+e.message);}
-}
 function getF(){
   const de=document.getElementById('rd').value,at=document.getElementById('ra').value,mid=document.getElementById('rm').value;
   let fr=[...AFs];
@@ -562,7 +649,7 @@ function genPDF(){
   doc.setFillColor(208,32,26);doc.rect(0,18,297,4,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');
   doc.text('ANDRADE FRETES',14,12);
-  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Relatorio de Fretes',14,16.5);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Relatorio Geral de Fretes',14,16.5);
   doc.text('Gerado em: '+new Date().toLocaleString('pt-BR'),297-14,12,{align:'right'});
   doc.setTextColor(30,30,30);doc.setFontSize(9);
   doc.text('Periodo: '+(de?fd(de):'inicio')+' a '+(at?fd(at):'hoje'),14,28);
@@ -588,14 +675,14 @@ function genPDF(){
     [fd(f.data),mo?mo.nome:'—',f.origem,f.destino,R(f.valor),f.status==='pago'?'Pago':'Pendente',f.obs||''].forEach((v,ci)=>{
       if(ci===5)doc.setTextColor(f.status==='pago'?59:154,f.status==='pago'?109:99,f.status==='pago'?17:11);
       else doc.setTextColor(30,30,30);
-      doc.text((doc.splitTextToSize(v,cols[ci].w-3)[0]||''),cx+2,y+4.5);cx+=cols[ci].w;
+      doc.text((doc.splitTextToSize(String(v),cols[ci].w-3)[0]||''),cx+2,y+4.5);cx+=cols[ci].w;
     });y+=6;
   });
   for(let i=1;i<=doc.internal.getNumberOfPages();i++){
     doc.setPage(i);doc.setFillColor(27,58,107);doc.rect(0,200,297,7,'F');
     doc.setTextColor(200,210,230);doc.setFontSize(7);
     doc.text('Andrade Fretes — Sistema de Controle de Fretes',14,204.5);
-    doc.text('Pagina '+i+' de '+doc.internal.getNumberOfPages(),297-14,204.5,{align:'right'});
+    doc.text('Pag. '+i+'/'+doc.internal.getNumberOfPages(),297-14,204.5,{align:'right'});
   }
   doc.save('andrade-fretes-relatorio.pdf');toast('PDF gerado!');
 }
@@ -613,7 +700,7 @@ function prevCSV(e){
       if(!mo)er++;
       CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:p[ci.data]||'',origem:p[ci.origem]||'',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase()});
     }
-    let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVf.length+' registros'+(er?' — <span style="color:var(--red)">'+er+' não encontrado(s)</span>':'')+' </p>';
+    let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVf.length+' registros'+(er?' — <span style="color:var(--red)">'+er+' não encontrado(s)</span>':'')+'</p>';
     h+='<div class="ox"><table><thead><tr><th>Motorista</th><th>Data</th><th>Rota</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>';
     CSVf.forEach(r=>{h+='<tr><td>'+r.nomeMot+'</td><td>'+r.data+'</td><td style="font-size:12px">'+r.origem+' → '+r.destino+'</td><td>'+R(r.valor)+'</td><td style="font-size:12px">'+r.status+'</td><td><span class="badge '+(r.ok?'bok':'ber')+'">'+(r.ok?'OK':'Erro')+'</span></td></tr>';});
     document.getElementById('cpv').innerHTML=h+'</tbody></table></div>';
@@ -632,7 +719,7 @@ async function importCSV(){
   setBtn('bim',false,'Importar registros');
 }
 function dlModeloFretes(){
-  const csv='motorista,data,origem,destino,valor,status\nJoao Silva,2026-04-14,Recife,Caruaru,320.00,pago\nMaria Souza,2026-04-14,Recife,Natal,580.00,pendente';
+  const csv='motorista,data,origem,destino,valor,status\nJoao Silva,2026-04-14,Recife,Caruaru,320.00,pago\nMaria Santos,2026-04-14,Recife,Natal,580.00,pendente';
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='modelo_fretes.csv';a.click();
