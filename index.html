@@ -390,7 +390,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 let db,fns,CU=null,AMs=[],AFs=[],CSVf=[],CSVm=[],unsub=null;
 function wDB(cb){if(window._dbReady){db=window._db;fns=window._fns;cb();}else document.addEventListener('db-ready',()=>{db=window._db;fns=window._fns;cb();});}
 wDB(()=>{document.getElementById('ls').style.display='none';showP('login');initAdmin();});
-async function initAdmin(){try{const s=await fns.getDocs(fns.collection(db,'motoristas'));if(s.empty)await fns.setDoc(fns.doc(db,'config','admin'),{usuario:'admin',senha:'admin123'});}catch(e){}}
+async function initAdmin(){try{const s=await fns.getDocs(fns.collection(db,'motoristas'));if(s.empty)await fns.setDoc(fns.doc(db,'config','ADMIN'),{usuario:'ADMIN',senha:'ADMIN123'});}catch(e){}}
 function showP(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');}
 function showA(id,msg,tp){const el=document.getElementById(id);if(!el)return;el.innerHTML='<div class="alert a'+tp+'">'+msg+'</div>';setTimeout(()=>{el.innerHTML='';},3500);}
 function setBtn(id,v,lbl){const b=document.getElementById(id);if(!b)return;b.disabled=v;b.innerHTML=v?'<span class="spin"></span> Aguarde...':lbl;}
