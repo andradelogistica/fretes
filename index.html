@@ -122,7 +122,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
     <div id="ema"></div>
     <div class="fr">
       <div><label>Nome completo</label><input type="text" id="em-nome"></div>
-      <div><label>Usuário (login)</label><input type="text" id="em-user"></div>
+      <div><label>Usuário (login)</label><input type="text" id="em-user" oninput="this.value=this.value.toUpperCase()"></div>
     </div>
     <div class="fr">
       <div>
@@ -180,7 +180,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
     </div>
     <div class="card">
       <div id="la"></div>
-      <div class="fg"><label>Usuário</label><input id="lu" type="text" placeholder="Digite seu usuário" autocomplete="username"></div>
+      <div class="fg"><label>Usuário</label><input id="lu" type="text" placeholder="Digite seu usuário" autocomplete="username" oninput="this.value=this.value.toUpperCase()"></div>
       <div class="fg">
         <label>Senha</label>
         <div class="pw-wrap">
@@ -192,7 +192,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
       </div>
       <button class="bp" id="bl" style="width:100%;margin-top:4px" onclick="doLogin()">Entrar</button>
     </div>
-    <p style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:10px">Primeiro acesso: admin / admin123</p>
+    <p style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:10px">Desenvolvido por Diego Cardoso</p>
   </div>
 </div>
 
@@ -322,7 +322,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
       <div class="card">
         <div style="font-weight:500;margin-bottom:1rem">Cadastrar motorista</div>
         <div id="ca"></div>
-        <div class="fr"><div><label>Nome completo</label><input type="text" id="cn" placeholder="Nome do motorista"></div><div><label>Usuário (login)</label><input type="text" id="cu" placeholder="sem espaços"></div></div>
+        <div class="fr"><div><label>Nome completo</label><input type="text" id="cn" placeholder="Nome do motorista"></div><div><label>Usuário (login)</label><input type="text" id="cu" placeholder="SEM ESPAÇOS" oninput="this.value=this.value.toUpperCase()"></div></div>
         <div class="fr">
           <div>
             <label>Senha</label>
@@ -410,7 +410,7 @@ function togglePw(id,btn){
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 async function doLogin(){
-  const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
+  const u=document.getElementById('lu').value.trim().toUpperCase(),p=document.getElementById('lp').value;
   if(!u||!p){showA('la','Preencha usuário e senha.','er');return;}
   setBtn('bl',true,'Entrar');
   try{
@@ -599,7 +599,7 @@ function openModalMot(m){
 async function saveEditMot(){
   const id=document.getElementById('em-id').value;
   const nm=document.getElementById('em-nome').value.trim();
-  const us=document.getElementById('em-user').value.trim().toLowerCase().replace(/\s/g,'');
+  const us=document.getElementById('em-user').value.trim().toUpperCase().replace(/\s/g,'');
   const sn=document.getElementById('em-senha').value;
   const tl=document.getElementById('em-tel').value.trim();
   if(!nm||!us){showA('ema','Preencha nome e usuário.','er');return;}
@@ -620,7 +620,7 @@ async function saveEditMot(){
 }
 
 async function addMot(){
-  const nm=document.getElementById('cn').value.trim(),us=document.getElementById('cu').value.trim().toLowerCase().replace(/\s/g,''),
+  const nm=document.getElementById('cn').value.trim(),us=document.getElementById('cu').value.trim().toUpperCase().replace(/\s/g,''),
     sn=document.getElementById('cs').value,tl=document.getElementById('ct').value.trim();
   if(!nm||!us||sn.length<4){showA('ca','Preencha nome, usuário e senha (mín. 4 caracteres).','er');return;}
   if(AMs.find(m=>m.usuario===us)){showA('ca','Esse usuário já existe.','er');return;}
@@ -668,7 +668,7 @@ function prevMots(e){
     let erros=0;
     for(let i=1;i<lines.length;i++){
       const p=lines[i].split(',').map(x=>x.trim());if(p.length<3)continue;
-      const nm=p[ci.nome]||'',us=(p[ci.usuario]||'').toLowerCase().replace(/\s/g,''),sn=p[ci.senha]||'',tl=p[ci.telefone]||'';
+      const nm=p[ci.nome]||'',us=(p[ci.usuario]||'').toUpperCase().replace(/\s/g,''),sn=p[ci.senha]||'',tl=p[ci.telefone]||'';
       const dup=AMs.find(m=>m.usuario===us);
       const ok=!!(nm&&us&&sn.length>=4&&!dup);
       if(!ok)erros++;
