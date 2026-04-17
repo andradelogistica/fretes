@@ -105,7 +105,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
     <div class="fr"><div><label>Motorista</label><select id="em"></select></div><div><label>Data</label><input type="date" id="edt"></div></div>
     <div class="fr"><div><label>Origem</label><input type="text" id="eo"></div><div><label>Destino</label><input type="text" id="ede"></div></div>
     <div class="fr"><div><label>Valor (R$)</label><input type="number" id="ev" min="0" step="0.01"></div><div><label>Status</label><select id="est"><option value="pendente">Pendente</option><option value="pago">Pago</option></select></div></div>
-    <div class="fg"><label>Observação</label><input type="text" id="eob"></div>
+    <div class="fr"><div><label>Tipo de operação</label><select id="etipo"><option value="Entrega">Entrega</option><option value="Coleta">Coleta</option><option value="Transferência">Transferência</option><option value="Distribuição">Distribuição</option><option value="Devolução">Devolução</option><option value="Outro">Outro</option></select></div><div><label>Observação</label><input type="text" id="eob"></div></div>
     <input type="hidden" id="eid">
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px">
       <button onclick="closeModal('mbg-frete')">Cancelar</button>
@@ -290,7 +290,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
         <div class="fr"><div><label>Motorista</label><select id="lm"><option value="">Selecione...</option></select></div><div><label>Data</label><input type="date" id="lda"></div></div>
         <div class="fr"><div><label>Origem</label><input type="text" id="lo" placeholder="Ex: Recife"></div><div><label>Destino</label><input type="text" id="lde" placeholder="Ex: Caruaru"></div></div>
         <div class="fr"><div><label>Valor (R$)</label><input type="number" id="lv" placeholder="0,00" min="0" step="0.01"></div><div><label>Status</label><select id="lst"><option value="pendente">Pendente</option><option value="pago">Pago</option></select></div></div>
-        <div class="fg"><label>Observação (opcional)</label><input type="text" id="lob" placeholder="Informação adicional"></div>
+        <div class="fr"><div><label>Tipo de operação</label><select id="ltipo"><option value="Entrega">Entrega</option><option value="Coleta">Coleta</option><option value="Transferência">Transferência</option><option value="Distribuição">Distribuição</option><option value="Devolução">Devolução</option><option value="Outro">Outro</option></select></div><div><label>Observação (opcional)</label><input type="text" id="lob" placeholder="Informação adicional"></div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="bp" id="bla" onclick="lancar()">Salvar frete</button>
           <button onclick="clearL()">Limpar</button>
@@ -302,7 +302,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
     <div id="tab-im" style="display:none">
       <div class="card">
         <div style="font-weight:500;margin-bottom:8px">Importar fretes via CSV</div>
-        <p style="font-size:13px;color:var(--text-sec);margin-bottom:1rem">Colunas: <code style="font-size:12px;background:var(--bg-sec);padding:1px 5px;border-radius:4px">motorista, data, origem, destino, valor, status</code></p>
+        <p style="font-size:13px;color:var(--text-sec);margin-bottom:1rem">Colunas: <code style="font-size:12px;background:var(--bg-sec);padding:1px 5px;border-radius:4px">motorista, data, origem, destino, valor, status, tipo</code></p>
         <div style="border:1.5px dashed var(--border-med);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem">
           <p style="font-size:13px;color:var(--text-sec);margin-bottom:8px">Selecione um arquivo .csv</p>
           <input type="file" id="cf" accept=".csv" style="display:none" onchange="prevCSV(event)">
@@ -465,8 +465,8 @@ function renderMot(){
   const tot=fr.reduce((s,f)=>s+f.valor,0);
   const el=document.getElementById('mtt');
   if(!fr.length){el.innerHTML='<p style="text-align:center;color:var(--text-sec);padding:1.5rem;font-size:13px">Nenhum frete encontrado.</p>';return;}
-  let h='<div class="ox"><table><thead><tr><th>Data</th><th>Rota</th><th>Valor</th><th>Status</th><th>Obs</th></tr></thead><tbody>';
-  fr.forEach(f=>{h+='<tr><td style="white-space:nowrap">'+fd(f.data)+'</td><td style="white-space:nowrap">'+f.origem+' → '+f.destino+'</td><td style="white-space:nowrap;font-weight:500">'+R(f.valor)+'</td><td><span class="badge '+(f.status==='pago'?'bok':'bpd')+'">'+(f.status==='pago'?'Pago':'Pendente')+'</span></td><td style="color:var(--text-sec);font-size:12px">'+(f.obs||'—')+'</td></tr>';});
+  let h='<div class="ox"><table><thead><tr><th>Data</th><th>Tipo</th><th>Rota</th><th>Valor</th><th>Status</th><th>Obs</th></tr></thead><tbody>';
+  fr.forEach(f=>{h+='<tr><td style="white-space:nowrap">'+fd(f.data)+'</td><td><span class="badge" style="background:var(--blue-light);color:var(--blue-dark);font-size:10px">'+(f.tipo||'—')+'</span></td><td style="white-space:nowrap">'+f.origem+' → '+f.destino+'</td><td style="white-space:nowrap;font-weight:500">'+R(f.valor)+'</td><td><span class="badge '+(f.status==='pago'?'bok':'bpd')+'">'+(f.status==='pago'?'Pago':'Pendente')+'</span></td><td style="color:var(--text-sec);font-size:12px">'+(f.obs||'—')+'</td></tr>';});
   h+='</tbody><tfoot><tr><td colspan="2" style="padding:8px 10px;font-size:12px;color:var(--text-sec)">Total filtrado</td><td style="padding:8px 10px;font-weight:500">'+R(tot)+'</td><td colspan="2"></td></tr></tfoot></table></div>';
   el.innerHTML=h;
 }
@@ -497,7 +497,7 @@ function pdfMotorista(){
     doc.setTextColor(tp==='ok'?59:tp==='pd'?154:30,tp==='ok'?109:tp==='pd'?99:30,tp==='ok'?17:tp==='pd'?11:30);
     doc.text(v,x+4,51);doc.setFont('helvetica','normal');doc.setTextColor(30,30,30);
   });
-  const cols=[{h:'Data',w:24},{h:'Origem',w:36},{h:'Destino',w:36},{h:'Valor',w:30},{h:'Status',w:22},{h:'Obs',w:48}];
+  const cols=[{h:'Data',w:24},{h:'Tipo',w:24},{h:'Origem',w:30},{h:'Destino',w:30},{h:'Valor',w:26},{h:'Status',w:20},{h:'Obs',w:42}];
   let y=58,cx=14;
   doc.setFillColor(27,58,107);doc.rect(14,y,cols.reduce((s,c)=>s+c.w,0),7,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
@@ -507,8 +507,8 @@ function pdfMotorista(){
     if(y>275){doc.addPage();y=15;}
     doc.setFillColor(i%2===0?255:248,248,248);doc.rect(14,y,cols.reduce((s,c)=>s+c.w,0),6,'F');
     doc.setTextColor(30,30,30);cx=14;
-    [fd(f.data),f.origem,f.destino,R(f.valor),f.status==='pago'?'Pago':'Pendente',f.obs||''].forEach((v,ci)=>{
-      if(ci===4)doc.setTextColor(f.status==='pago'?59:154,f.status==='pago'?109:99,f.status==='pago'?17:11);
+    [fd(f.data),f.tipo||'—',f.origem,f.destino,R(f.valor),f.status==='pago'?'Pago':'Pendente',f.obs||''].forEach((v,ci)=>{
+      if(ci===5)doc.setTextColor(f.status==='pago'?59:154,f.status==='pago'?109:99,f.status==='pago'?17:11);
       else doc.setTextColor(30,30,30);
       doc.text((doc.splitTextToSize(String(v),cols[ci].w-3)[0]||''),cx+2,y+4.5);cx+=cols[ci].w;
     });y+=6;
@@ -543,18 +543,19 @@ async function lancar(){
   const mid=document.getElementById('lm').value,da=document.getElementById('lda').value,
     or=document.getElementById('lo').value.trim(),de=document.getElementById('lde').value.trim(),
     va=parseFloat(document.getElementById('lv').value),st=document.getElementById('lst').value,
+    tp=document.getElementById('ltipo').value,
     ob=document.getElementById('lob').value.trim();
   if(!mid||!da||!or||!de||isNaN(va)||va<=0){showA('lal','Preencha todos os campos obrigatórios.','er');return;}
   setBtn('bla',true,'Salvar frete');
   try{
-    const ref=await fns.addDoc(fns.collection(db,'fretes'),{motId:mid,data:da,origem:or,destino:de,valor:va,status:st,obs:ob,criadoEm:new Date().toISOString()});
-    AFs.unshift({id:ref.id,motId:mid,data:da,origem:or,destino:de,valor:va,status:st,obs:ob,criadoEm:new Date().toISOString()});
+    const ref=await fns.addDoc(fns.collection(db,'fretes'),{motId:mid,data:da,origem:or,destino:de,valor:va,status:st,tipo:tp,obs:ob,criadoEm:new Date().toISOString()});
+    AFs.unshift({id:ref.id,motId:mid,data:da,origem:or,destino:de,valor:va,status:st,tipo:tp,obs:ob,criadoEm:new Date().toISOString()});
     AFs.sort((a,b)=>b.data.localeCompare(a.data));
     showA('lal','Frete lançado com sucesso!','ok');clearL();
   }catch(e){showA('lal','Erro: '+e.message,'er');}
   setBtn('bla',false,'Salvar frete');
 }
-function clearL(){['lm','lo','lde','lv','lob'].forEach(id=>document.getElementById(id).value='');document.getElementById('lda').value=tod();document.getElementById('lst').value='pendente';}
+function clearL(){['lm','lo','lde','lv','lob'].forEach(id=>document.getElementById(id).value='');document.getElementById('lda').value=tod();document.getElementById('lst').value='pendente';document.getElementById('ltipo').value='Entrega';}
 
 // Edição de frete
 function openModalFrete(f){
@@ -562,19 +563,19 @@ function openModalFrete(f){
   document.getElementById('eid').value=f.id;document.getElementById('em').value=f.motId;
   document.getElementById('edt').value=f.data;document.getElementById('eo').value=f.origem;
   document.getElementById('ede').value=f.destino;document.getElementById('ev').value=f.valor;
-  document.getElementById('est').value=f.status;document.getElementById('eob').value=f.obs||'';
+  document.getElementById('est').value=f.status;document.getElementById('etipo').value=f.tipo||'Entrega';document.getElementById('eob').value=f.obs||'';
   document.getElementById('mbg-frete').classList.add('open');
 }
 async function saveEditFrete(){
   const id=document.getElementById('eid').value,mid=document.getElementById('em').value,
     da=document.getElementById('edt').value,or=document.getElementById('eo').value.trim(),
     de=document.getElementById('ede').value.trim(),va=parseFloat(document.getElementById('ev').value),
-    st=document.getElementById('est').value,ob=document.getElementById('eob').value.trim();
+    st=document.getElementById('est').value,tp=document.getElementById('etipo').value,ob=document.getElementById('eob').value.trim();
   if(!mid||!da||!or||!de||isNaN(va)||va<=0){showA('ea','Preencha todos os campos.','er');return;}
   setBtn('bse',true,'Salvar');
   try{
-    await fns.updateDoc(fns.doc(db,'fretes',id),{motId:mid,data:da,origem:or,destino:de,valor:va,status:st,obs:ob});
-    const i=AFs.findIndex(x=>x.id===id);if(i!==-1)AFs[i]={...AFs[i],motId:mid,data:da,origem:or,destino:de,valor:va,status:st,obs:ob};
+    await fns.updateDoc(fns.doc(db,'fretes',id),{motId:mid,data:da,origem:or,destino:de,valor:va,status:st,tipo:tp,obs:ob});
+    const i=AFs.findIndex(x=>x.id===id);if(i!==-1)AFs[i]={...AFs[i],motId:mid,data:da,origem:or,destino:de,valor:va,status:st,tipo:tp,obs:ob};
     AFs.sort((a,b)=>b.data.localeCompare(a.data));closeModal('mbg-frete');renderRel();toast('Frete atualizado!');
   }catch(e){showA('ea','Erro: '+e.message,'er');}
   setBtn('bse',false,'Salvar');
@@ -713,10 +714,10 @@ function renderRel(){
   document.getElementById('rp').textContent=R(pg);document.getElementById('rpe').textContent=R(pd);document.getElementById('rq').textContent=fr.length;
   const el=document.getElementById('rt');
   if(!fr.length){el.innerHTML='<p style="text-align:center;color:var(--text-sec);padding:1.5rem;font-size:13px">Nenhum frete no período.</p>';return;}
-  let h='<div class="ox"><table><thead><tr><th>Data</th><th>Motorista</th><th>Rota</th><th>Valor</th><th>Status</th><th style="text-align:center">Ações</th></tr></thead><tbody>';
+  let h='<div class="ox"><table><thead><tr><th>Data</th><th>Motorista</th><th>Tipo</th><th>Rota</th><th>Valor</th><th>Status</th><th style="text-align:center">Ações</th></tr></thead><tbody>';
   fr.forEach(f=>{
     const mo=AMs.find(m=>m.id===f.motId);
-    h+='<tr><td style="white-space:nowrap">'+fd(f.data)+'</td><td>'+(mo?mo.nome.split(' ')[0]:'(removido)')+'</td><td style="white-space:nowrap;font-size:12px">'+f.origem+' → '+f.destino+'</td><td style="white-space:nowrap;font-weight:500">'+R(f.valor)+'</td><td><span class="badge '+(f.status==='pago'?'bok':'bpd')+'">'+(f.status==='pago'?'Pago':'Pendente')+'</span></td><td style="white-space:nowrap;text-align:center"><button onclick="togSt(\''+f.id+'\')" style="font-size:11px;padding:3px 7px;margin-right:4px">'+(f.status==='pago'?'↩ Pendente':'✓ Pago')+'</button><button onclick="openModalFreteById(\''+f.id+'\')" style="font-size:11px;padding:3px 7px">Editar</button></td></tr>';
+    h+='<tr><td style="white-space:nowrap">'+fd(f.data)+'</td><td>'+(mo?mo.nome.split(' ')[0]:'(removido)')+'</td><td><span class="badge" style="background:var(--blue-light);color:var(--blue-dark);font-size:10px">'+(f.tipo||'—')+'</span></td><td style="white-space:nowrap;font-size:12px">'+f.origem+' → '+f.destino+'</td><td style="white-space:nowrap;font-weight:500">'+R(f.valor)+'</td><td><span class="badge '+(f.status==='pago'?'bok':'bpd')+'">'+(f.status==='pago'?'Pago':'Pendente')+'</span></td><td style="white-space:nowrap;text-align:center"><button onclick="togSt(\''+f.id+'\')" style="font-size:11px;padding:3px 7px;margin-right:4px">'+(f.status==='pago'?'↩ Pendente':'✓ Pago')+'</button><button onclick="openModalFreteById(\''+f.id+'\')" style="font-size:11px;padding:3px 7px">Editar</button></td></tr>';
   });
   el.innerHTML=h+'</tbody></table></div>';
 }
@@ -746,7 +747,7 @@ function genPDF(){
     doc.setFontSize(8);doc.setTextColor(95,94,90);doc.text(l,x+4,43);
     doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);doc.text(v,x+4,50);doc.setFont('helvetica','normal');
   });
-  const cols=[{h:'Data',w:22},{h:'Motorista',w:44},{h:'Origem',w:38},{h:'Destino',w:38},{h:'Valor',w:30},{h:'Status',w:24},{h:'Obs',w:84}];
+  const cols=[{h:'Data',w:20},{h:'Motorista',w:34},{h:'Tipo',w:22},{h:'Origem',w:30},{h:'Destino',w:30},{h:'Valor',w:26},{h:'Status',w:20},{h:'Obs',w:52}];
   let y=58,cx=14;
   doc.setFillColor(27,58,107);doc.rect(14,y,cols.reduce((s,c)=>s+c.w,0),7,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(8.5);doc.setFont('helvetica','bold');
@@ -757,8 +758,8 @@ function genPDF(){
     doc.setFillColor(i%2===0?255:248,248,248);doc.rect(14,y,cols.reduce((s,c)=>s+c.w,0),6,'F');
     doc.setTextColor(30,30,30);cx=14;
     const mo=AMs.find(m=>m.id===f.motId);
-    [fd(f.data),mo?mo.nome:'—',f.origem,f.destino,R(f.valor),f.status==='pago'?'Pago':'Pendente',f.obs||''].forEach((v,ci)=>{
-      if(ci===5)doc.setTextColor(f.status==='pago'?59:154,f.status==='pago'?109:99,f.status==='pago'?17:11);
+    [fd(f.data),mo?mo.nome:'—',f.tipo||'—',f.origem,f.destino,R(f.valor),f.status==='pago'?'Pago':'Pendente',f.obs||''].forEach((v,ci)=>{
+      if(ci===6)doc.setTextColor(f.status==='pago'?59:154,f.status==='pago'?109:99,f.status==='pago'?17:11);
       else doc.setTextColor(30,30,30);
       doc.text((doc.splitTextToSize(String(v),cols[ci].w-3)[0]||''),cx+2,y+4.5);cx+=cols[ci].w;
     });y+=6;
@@ -777,26 +778,31 @@ function prevCSV(e){
   reader.onload=function(ev){
     const lines=ev.target.result.trim().split('\n');CSVf=[];
     const hdr=lines[0].split(',').map(x=>x.trim().toLowerCase());
-    const ci={motorista:hdr.indexOf('motorista'),data:hdr.indexOf('data'),origem:hdr.indexOf('origem'),destino:hdr.indexOf('destino'),valor:hdr.indexOf('valor'),status:hdr.indexOf('status')};
+    const ci={motorista:hdr.indexOf('motorista'),data:hdr.indexOf('data'),origem:hdr.indexOf('origem'),destino:hdr.indexOf('destino'),valor:hdr.indexOf('valor'),status:hdr.indexOf('status'),tipo:hdr.indexOf('tipo')};
     let er=0;
     for(let i=1;i<lines.length;i++){
       const p=lines[i].split(',').map(x=>x.trim());if(p.length<4)continue;
       const nm=p[ci.motorista]||'';const mo=AMs.find(m=>m.nome.toLowerCase()===nm.toLowerCase());
       if(!mo)er++;
-      CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:p[ci.data]||'',origem:p[ci.origem]||'',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase()});
+      const tipo=ci.tipo>=0?(p[ci.tipo]||'Entrega'):'Entrega';
+      const chave=(mo?mo.id:'')+'|'+(p[ci.data]||'')+'|'+(p[ci.origem]||'')+'|'+(p[ci.destino]||'')+'|'+(p[ci.valor]||'');
+      const dup=AFs.find(f=>f.motId===(mo?mo.id:null)&&f.data===(p[ci.data]||'')&&f.origem===(p[ci.origem]||'')&&f.destino===(p[ci.destino]||'')&&String(f.valor)===String(parseFloat((p[ci.valor]||'0').replace(',','.'))));
+      CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:p[ci.data]||'',origem:p[ci.origem]||'',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase(),tipo,duplicado:!!dup});
     }
     let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVf.length+' registros'+(er?' — <span style="color:var(--red)">'+er+' nao encontrado(s)</span>':'')+'</p>';
-    h+='<div class="ox"><table><thead><tr><th>Motorista</th><th>Data</th><th>Rota</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>';
-    CSVf.forEach(r=>{h+='<tr><td>'+r.nomeMot+'</td><td>'+r.data+'</td><td style="font-size:12px">'+r.origem+' → '+r.destino+'</td><td>'+R(r.valor)+'</td><td style="font-size:12px">'+r.status+'</td><td><span class="badge '+(r.ok?'bok':'ber')+'">'+(r.ok?'OK':'Erro')+'</span></td></tr>';});
+    const dups=CSVf.filter(r=>r.duplicado).length;
+    if(dups>0)h+='<div class="alert aer" style="margin-bottom:8px">'+dups+' registro(s) já existem no banco e serão ignorados na importação.</div>';
+    h+='<div class="ox"><table><thead><tr><th>Motorista</th><th>Data</th><th>Tipo</th><th>Rota</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>';
+    CSVf.forEach(r=>{const st=r.duplicado?'<span class="badge bpd">Duplicado</span>':r.ok?'<span class="badge bok">OK</span>':'<span class="badge ber">Erro</span>';h+='<tr><td>'+r.nomeMot+'</td><td>'+r.data+'</td><td style="font-size:12px">'+r.tipo+'</td><td style="font-size:12px">'+r.origem+' → '+r.destino+'</td><td>'+R(r.valor)+'</td><td style="font-size:12px">'+r.status+'</td><td>'+st+'</td></tr>';});
     document.getElementById('cpv').innerHTML=h+'</tbody></table></div>';
     document.getElementById('bim').style.display=CSVf.filter(r=>r.ok).length>0?'inline-block':'none';
   };reader.readAsText(file,'UTF-8');
 }
 async function importCSV(){
-  const vl=CSVf.filter(r=>r.ok&&r.data&&r.origem&&r.destino&&!isNaN(r.valor)&&r.valor>0);
+  const vl=CSVf.filter(r=>r.ok&&!r.duplicado&&r.data&&r.origem&&r.destino&&!isNaN(r.valor)&&r.valor>0);
   setBtn('bim',true,'Importar registros');
   try{
-    for(const r of vl){const ref=await fns.addDoc(fns.collection(db,'fretes'),{motId:r.motId,data:r.data,origem:r.origem,destino:r.destino,valor:r.valor,status:r.status,obs:'',criadoEm:new Date().toISOString()});AFs.unshift({id:ref.id,...r});}
+    for(const r of vl){const ref=await fns.addDoc(fns.collection(db,'fretes'),{motId:r.motId,data:r.data,origem:r.origem,destino:r.destino,valor:r.valor,status:r.status,tipo:r.tipo||'Entrega',obs:'',criadoEm:new Date().toISOString()});AFs.unshift({id:ref.id,...r});}
     AFs.sort((a,b)=>b.data.localeCompare(a.data));
     showA('cal',vl.length+' fretes importados!','ok');
     document.getElementById('cpv').innerHTML='';document.getElementById('cf').value='';CSVf=[];
@@ -804,7 +810,7 @@ async function importCSV(){
   setBtn('bim',false,'Importar registros');
 }
 function dlModeloFretes(){
-  const csv='motorista,data,origem,destino,valor,status\nJoao Silva,2026-04-15,Recife,Caruaru,320.00,pago\nMaria Santos,2026-04-15,Recife,Natal,580.00,pendente';
+  const csv='motorista,data,origem,destino,valor,status,tipo\nJoao Silva,2026-04-15,Recife,Caruaru,320.00,pago,Entrega\nMaria Santos,2026-04-15,Recife,Natal,580.00,pendente,Coleta';
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='modelo_fretes.csv';a.click();
 }
 ['lu','lp'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();}));
