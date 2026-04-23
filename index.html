@@ -85,6 +85,10 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 .mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:1rem}
 .mbg.open{display:flex}
 .modal{background:var(--bg-card);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:480px;border:0.5px solid var(--border);max-height:90vh;overflow-y:auto}
+.tipo-entrega{background:#E6F1FB;color:#0C447C}
+.tipo-pernoite{background:#FAEEDA;color:#633806}
+.tipo-reentrega{background:#FFE8D6;color:#7C3500}
+.tipo-outro{background:#f1efe8;color:#5f5e5a}
 .ult-at{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-sec);border-radius:var(--radius);font-size:12px;color:var(--text-sec);margin-bottom:1rem}
 .ult-at strong{color:var(--text)}
 .pw-wrap{position:relative}
@@ -105,7 +109,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
     <div class="fr"><div><label>Motorista</label><select id="em"></select></div><div><label>Data</label><input type="date" id="edt"></div></div>
     <div class="fr"><div><label>Origem</label><input type="text" id="eo"></div><div><label>Destino</label><input type="text" id="ede"></div></div>
     <div class="fr"><div><label>Valor (R$)</label><input type="number" id="ev" min="0" step="0.01"></div><div><label>Status</label><select id="est"><option value="pendente">Pendente</option><option value="pago">Pago</option></select></div></div>
-    <div class="fr"><div><label>Tipo de operação</label><select id="etipo"><option value="Entrega">Entrega</option><option value="Coleta">Coleta</option><option value="Transferência">Transferência</option><option value="Distribuição">Distribuição</option><option value="Devolução">Devolução</option><option value="Outro">Outro</option></select></div><div><label>Observação</label><input type="text" id="eob"></div></div>
+    <div class="fr"><div><label>Tipo de operação</label><select id="etipo"><option value="Entrega">Entrega</option><option value="Pernoite">Pernoite</option><option value="Reentrega">Reentrega</option><option value="Coleta">Coleta</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div><div><label>Observação</label><input type="text" id="eob"></div></div>
     <input type="hidden" id="eid">
     <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px">
       <button onclick="closeModal('mbg-frete')">Cancelar</button>
@@ -287,10 +291,10 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
       <div class="card">
         <div style="font-weight:500;margin-bottom:1rem">Novo lançamento de frete</div>
         <div id="lal"></div>
-        <div class="fr"><div><label>Motorista</label><select id="lm"><option value="">Selecione...</option></select></div><div><label>Data</label><input type="date" id="lda"></div></div>
+        <div class="fr"><div><label>Buscar por Placa</label><input type="text" id="lm-busca" placeholder="Digite a placa..." oninput="filtrarPlaca()" autocomplete="off" style="margin-bottom:6px"><select id="lm" size="1"><option value="">Selecione a placa...</option></select></div><div><label>Data</label><input type="date" id="lda"></div></div>
         <div class="fr"><div><label>Origem</label><input type="text" id="lo" placeholder="Ex: Recife"></div><div><label>Destino</label><input type="text" id="lde" placeholder="Ex: Caruaru"></div></div>
         <div class="fr"><div><label>Valor (R$)</label><input type="number" id="lv" placeholder="0,00" min="0" step="0.01"></div><div><label>Status</label><select id="lst"><option value="pendente">Pendente</option><option value="pago">Pago</option></select></div></div>
-        <div class="fr"><div><label>Tipo de operação</label><select id="ltipo"><option value="Entrega">Entrega</option><option value="Coleta">Coleta</option><option value="Transferência">Transferência</option><option value="Distribuição">Distribuição</option><option value="Devolução">Devolução</option><option value="Outro">Outro</option></select></div><div><label>Observação (opcional)</label><input type="text" id="lob" placeholder="Informação adicional"></div></div>
+        <div class="fr"><div><label>Tipo de operação</label><select id="ltipo"><option value="Entrega">Entrega</option><option value="Pernoite">Pernoite</option><option value="Reentrega">Reentrega</option><option value="Coleta">Coleta</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div><div><label>Observação (opcional)</label><input type="text" id="lob" placeholder="Informação adicional"></div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="bp" id="bla" onclick="lancar()">Salvar frete</button>
           <button onclick="clearL()">Limpar</button>
@@ -373,7 +377,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
           <div style="flex:1;min-width:110px"><label>De</label><input type="date" id="rd" onchange="renderRel()"></div>
           <div style="flex:1;min-width:110px"><label>Até</label><input type="date" id="ra" onchange="renderRel()"></div>
-          <div style="flex:1;min-width:130px"><label>Motorista</label><select id="rm" onchange="renderRel()"><option value="">Todos</option></select></div>
+          <div style="flex:1;min-width:130px"><label>Placa / Motorista</label><select id="rm" onchange="renderRel()"><option value="">Todos</option></select></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:1rem">
           <div class="metric"><div class="ml">Total pago</div><div class="mv" id="rp" style="color:var(--green)">R$0</div></div>
@@ -391,6 +395,36 @@ let db,fns,CU=null,AMs=[],AFs=[],CSVf=[],CSVm=[],unsub=null;
 function wDB(cb){if(window._dbReady){db=window._db;fns=window._fns;cb();}else document.addEventListener('db-ready',()=>{db=window._db;fns=window._fns;cb();});}
 wDB(()=>{document.getElementById('ls').style.display='none';showP('login');initAdmin();});
 async function initAdmin(){try{const s=await fns.getDocs(fns.collection(db,'motoristas'));if(s.empty)await fns.setDoc(fns.doc(db,'config','admin'),{usuario:'admin',senha:'admin123'});}catch(e){}}
+function filtrarPlaca(){
+  const busca=document.getElementById('lm-busca').value.toUpperCase();
+  const sel=document.getElementById('lm');
+  sel.innerHTML='<option value="">Selecione a placa...</option>';
+  AMs.filter(m=>!busca||m.usuario.toUpperCase().includes(busca)||m.nome.toUpperCase().includes(busca))
+    .forEach(m=>{
+      const opt=document.createElement('option');
+      opt.value=m.id;
+      opt.textContent=m.usuario+' — '+m.nome;
+      sel.appendChild(opt);
+    });
+}
+function normalizarTipo(t){
+  if(!t)return'Entrega';
+  const s=t.trim().toUpperCase();
+  if(s==='FRETE VENDAS'||s==='ENTREGA')return'Entrega';
+  if(s==='PERNOITE')return'Pernoite';
+  if(s==='REENTREGA')return'Reentrega';
+  if(s==='COLETA')return'Coleta';
+  if(s==='TRANSFERÊNCIA'||s==='TRANSFERENCIA')return'Transferência';
+  return t;
+}
+function tipoBadge(t){
+  const tp=normalizarTipo(t);
+  let cls='tipo-outro';
+  if(tp==='Entrega')cls='tipo-entrega';
+  else if(tp==='Pernoite')cls='tipo-pernoite';
+  else if(tp==='Reentrega')cls='tipo-reentrega';
+  return'<span class="badge '+cls+'" style="font-size:10px">'+tp+'</span>';
+}
 function showP(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');}
 function showA(id,msg,tp){const el=document.getElementById(id);if(!el)return;el.innerHTML='<div class="alert a'+tp+'">'+msg+'</div>';setTimeout(()=>{el.innerHTML='';},3500);}
 function setBtn(id,v,lbl){const b=document.getElementById(id);if(!b)return;b.disabled=v;b.innerHTML=v?'<span class="spin"></span> Aguarde...':lbl;}
@@ -526,12 +560,12 @@ function pdfMotorista(){
   toast('PDF gerado!');
 }
 
-function initG(){popSel();document.getElementById('lda').value=tod();renderMs();renderRel();}
+function initG(){popSel();filtrarPlaca();document.getElementById('lda').value=tod();renderMs();renderRel();}
 function popSel(){
   ['lm','rm','em'].forEach(id=>{
     const sel=document.getElementById(id);if(!sel)return;
     sel.innerHTML=id==='rm'?'<option value="">Todos</option>':'<option value="">Selecione...</option>';
-    AMs.forEach(m=>{sel.innerHTML+='<option value="'+m.id+'">'+m.nome+'</option>';});
+    AMs.forEach(m=>{sel.innerHTML+='<option value="'+m.id+'">'+(id==='lm'?m.usuario+' — '+m.nome:m.nome)+'</option>';});
   });
 }
 function sTab(t){
@@ -543,7 +577,7 @@ async function lancar(){
   const mid=document.getElementById('lm').value,da=document.getElementById('lda').value,
     or=document.getElementById('lo').value.trim(),de=document.getElementById('lde').value.trim(),
     va=parseFloat(document.getElementById('lv').value),st=document.getElementById('lst').value,
-    tp=document.getElementById('ltipo').value,
+    tp=normalizarTipo(document.getElementById('ltipo').value),
     ob=document.getElementById('lob').value.trim();
   if(!mid||!da||!or||!de||isNaN(va)||va<=0){showA('lal','Preencha todos os campos obrigatórios.','er');return;}
   setBtn('bla',true,'Salvar frete');
@@ -570,7 +604,7 @@ async function saveEditFrete(){
   const id=document.getElementById('eid').value,mid=document.getElementById('em').value,
     da=document.getElementById('edt').value,or=document.getElementById('eo').value.trim(),
     de=document.getElementById('ede').value.trim(),va=parseFloat(document.getElementById('ev').value),
-    st=document.getElementById('est').value,tp=document.getElementById('etipo').value,ob=document.getElementById('eob').value.trim();
+    st=document.getElementById('est').value,tp=normalizarTipo(document.getElementById('etipo').value),ob=document.getElementById('eob').value.trim();
   if(!mid||!da||!or||!de||isNaN(va)||va<=0){showA('ea','Preencha todos os campos.','er');return;}
   setBtn('bse',true,'Salvar');
   try{
@@ -784,7 +818,7 @@ function prevCSV(e){
       const p=lines[i].split(',').map(x=>x.trim());if(p.length<4)continue;
       const nm=p[ci.motorista]||'';const mo=AMs.find(m=>m.nome.toLowerCase()===nm.toLowerCase());
       if(!mo)er++;
-      const tipo=ci.tipo>=0?(p[ci.tipo]||'Entrega'):'Entrega';
+      const tipo=normalizarTipo(ci.tipo>=0?(p[ci.tipo]||'Entrega'):'Entrega');
       const chave=(mo?mo.id:'')+'|'+(p[ci.data]||'')+'|'+(p[ci.origem]||'')+'|'+(p[ci.destino]||'')+'|'+(p[ci.valor]||'');
       const dup=AFs.find(f=>f.motId===(mo?mo.id:null)&&f.data===(p[ci.data]||'')&&f.origem===(p[ci.origem]||'')&&f.destino===(p[ci.destino]||'')&&String(f.valor)===String(parseFloat((p[ci.valor]||'0').replace(',','.'))));
       CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:p[ci.data]||'',origem:p[ci.origem]||'',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase(),tipo,duplicado:!!dup});
