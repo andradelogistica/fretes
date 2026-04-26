@@ -89,6 +89,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
 .tipo-pernoite{background:#FAEEDA;color:#633806}
 .tipo-reentrega{background:#FFE8D6;color:#7C3500}
 .tipo-outro{background:#f1efe8;color:#5f5e5a}
+.tipo-carromae{background:#EDE9FE;color:#4C1D95}
 .ult-at{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-sec);border-radius:var(--radius);font-size:12px;color:var(--text-sec);margin-bottom:1rem}
 .ult-at strong{color:var(--text)}
 .pw-wrap{position:relative}
@@ -306,7 +307,7 @@ label{display:block;font-size:12px;color:var(--text-sec);margin-bottom:4px}
     <div id="tab-im" style="display:none">
       <div class="card">
         <div style="font-weight:500;margin-bottom:8px">Importar fretes via CSV</div>
-        <p style="font-size:13px;color:var(--text-sec);margin-bottom:1rem">Colunas: <code style="font-size:12px;background:var(--bg-sec);padding:1px 5px;border-radius:4px">motorista, data, destino, valor, status, tipo</code><br><small style="color:var(--text-sec)">Origem sempre: CDV Recife</small></p>
+        <p style="font-size:13px;color:var(--text-sec);margin-bottom:1rem">Colunas (sem cabeçalho): <code style="font-size:12px;background:var(--bg-sec);padding:1px 5px;border-radius:4px">placa, data, destino, valor, status, tipo</code><br><small style="color:var(--text-sec)">Origem fixa: CDV Recife &nbsp;|&nbsp; Data aceita: DD/MM/AAAA, AAAA-MM-DD ou serial do Excel</small></p>
         <div style="border:1.5px dashed var(--border-med);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem">
           <p style="font-size:13px;color:var(--text-sec);margin-bottom:8px">Selecione um arquivo .csv</p>
           <input type="file" id="cf" accept=".csv" style="display:none" onchange="prevCSV(event)">
@@ -407,15 +408,42 @@ function filtrarPlaca(){
       sel.appendChild(opt);
     });
 }
+function excelSerialToISO(val){
+  // Converte número serial do Excel (ex: 46024) para YYYY-MM-DD
+  const n=parseInt(val);
+  if(isNaN(n)||n<1||n>100000)return val; // não é serial, retorna como está
+  const base=new Date(Date.UTC(1899,11,30));
+  const d=new Date(base.getTime()+n*86400000);
+  const y=d.getUTCFullYear(),m=String(d.getUTCMonth()+1).padStart(2,'0'),day=String(d.getUTCDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function normalizarData(val){
+  if(!val)return'';
+  const s=val.trim();
+  // Formato DD/MM/YYYY
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(s)){
+    const[d,m,y]=s.split('/');return y+'-'+m+'-'+d;
+  }
+  // Formato DD-MM-YYYY
+  if(/^\d{2}-\d{2}-\d{4}$/.test(s)){
+    const[d,m,y]=s.split('-');return y+'-'+m+'-'+d;
+  }
+  // Formato YYYY-MM-DD (já correto)
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  // Número serial do Excel
+  if(/^\d{4,6}$/.test(s))return excelSerialToISO(s);
+  return s;
+}
 function normalizarTipo(t){
   if(!t)return'Entrega';
-  const s=t.trim().toUpperCase();
+  const s=t.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   if(s==='FRETE VENDAS'||s==='ENTREGA')return'Entrega';
-  if(s==='PERNOITE')return'Pernoite';
+  if(s.startsWith('PERNOITE'))return'Pernoite';
   if(s==='REENTREGA')return'Reentrega';
   if(s==='COLETA')return'Coleta';
-  if(s==='TRANSFERÊNCIA'||s==='TRANSFERENCIA')return'Transferência';
-  return t;
+  if(s==='TRANSFERENCIA'||s==='TRANSFERENCIA')return'Transferência';
+  if(s.includes('CARRO'))return'Carro Mãe';
+  return'Entrega';
 }
 function tipoBadge(t){
   const tp=normalizarTipo(t);
@@ -423,6 +451,7 @@ function tipoBadge(t){
   if(tp==='Entrega')cls='tipo-entrega';
   else if(tp==='Pernoite')cls='tipo-pernoite';
   else if(tp==='Reentrega')cls='tipo-reentrega';
+  else if(tp==='Carro Mãe')cls='tipo-carromae';
   return'<span class="badge '+cls+'" style="font-size:10px">'+tp+'</span>';
 }
 function showP(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');}
@@ -812,17 +841,27 @@ function prevCSV(e){
   const reader=new FileReader();
   reader.onload=function(ev){
     const lines=ev.target.result.trim().split('\n');CSVf=[];
-    const hdr=lines[0].split(',').map(x=>x.trim().toLowerCase());
-    const ci={motorista:hdr.indexOf('motorista'),data:hdr.indexOf('data'),destino:hdr.indexOf('destino'),valor:hdr.indexOf('valor'),status:hdr.indexOf('status'),tipo:hdr.indexOf('tipo')};
+    // Detectar se a primeira linha é cabeçalho ou dado
+    const firstCols=lines[0].split(',').map(x=>x.trim().toLowerCase());
+    const temHeader=firstCols.includes('motorista')||firstCols.includes('placa');
+    let ci={motorista:0,data:1,destino:2,valor:3,status:4,tipo:5}; // padrão sem header
+    let startLine=0;
+    if(temHeader){
+      ci={motorista:firstCols.indexOf('motorista')>=0?firstCols.indexOf('motorista'):firstCols.indexOf('placa'),
+          data:firstCols.indexOf('data'),destino:firstCols.indexOf('destino'),
+          valor:firstCols.indexOf('valor'),status:firstCols.indexOf('status'),tipo:firstCols.indexOf('tipo')};
+      startLine=1;
+    }
     let er=0;
-    for(let i=1;i<lines.length;i++){
+    for(let i=startLine;i<lines.length;i++){
       const p=lines[i].split(',').map(x=>x.trim());if(p.length<4)continue;
-      const nm=p[ci.motorista]||'';const mo=AMs.find(m=>m.nome.toLowerCase()===nm.toLowerCase());
+      const nm=(p[ci.motorista]||'').trim().toUpperCase();const mo=AMs.find(m=>m.usuario.toUpperCase()===nm||m.nome.toUpperCase()===nm);
       if(!mo)er++;
       const tipo=normalizarTipo(ci.tipo>=0?(p[ci.tipo]||'Entrega'):'Entrega');
       const chave=(mo?mo.id:'')+'|'+(p[ci.data]||'')+'|'+(p[ci.origem]||'')+'|'+(p[ci.destino]||'')+'|'+(p[ci.valor]||'');
-      const dup=AFs.find(f=>f.motId===(mo?mo.id:null)&&f.data===(p[ci.data]||'')&&f.destino===(p[ci.destino]||'')&&String(f.valor)===String(parseFloat((p[ci.valor]||'0').replace(',','.'))));
-      CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:p[ci.data]||'',origem:'CDV Recife',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase(),tipo,duplicado:!!dup});
+      const dup=AFs.find(f=>f.motId===(mo?mo.id:null)&&f.data===dataConv&&f.destino===(p[ci.destino]||'')&&String(f.valor)===String(parseFloat((p[ci.valor]||'0').replace(',','.'))));
+      const dataConv=normalizarData(p[ci.data]||'');
+      CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:dataConv,origem:'CDV Recife',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase(),tipo,duplicado:!!dup});
     }
     let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVf.length+' registros'+(er?' — <span style="color:var(--red)">'+er+' nao encontrado(s)</span>':'')+'</p>';
     const dups=CSVf.filter(r=>r.duplicado).length;
@@ -845,7 +884,7 @@ async function importCSV(){
   setBtn('bim',false,'Importar registros');
 }
 function dlModeloFretes(){
-  const csv='motorista,data,destino,valor,status,tipo\nJOA1234,2026-04-15,Caruaru,320.00,pago,FRETE VENDAS\nMAR5678,2026-04-15,Natal,580.00,pendente,REENTREGA';
+  const csv='BHN3616,46024,JABOATAO DOS GUARARAPES,380,pendente,FRETE VENDAS\nCYN9851,46024,IPOJUCA,650,pendente,FRETE VENDAS\nDON5A36,46024,RECIFE,380,pendente,PERNOITE';
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='modelo_fretes.csv';a.click();
 }
 ['lu','lp'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();}));
