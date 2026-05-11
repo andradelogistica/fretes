@@ -1035,13 +1035,16 @@ function prevCSV(e){
     let er=0;
     for(let i=startLine;i<lines.length;i++){
       const p=lines[i].split(',').map(x=>x.trim());if(p.length<4)continue;
-      const nm=(p[ci.motorista]||'').trim().toUpperCase();const mo=AMs.find(m=>m.usuario.toUpperCase()===nm||m.nome.toUpperCase()===nm);
+      const nm=(p[ci.motorista]||'').trim().toUpperCase();
+      const mo=AMs.find(m=>m.usuario.toUpperCase()===nm||m.nome.toUpperCase()===nm);
       if(!mo)er++;
-      const tipo=normalizarTipo(ci.tipo>=0?(p[ci.tipo]||'Entrega'):'Entrega');
-      const chave=(mo?mo.id:'')+'|'+(p[ci.data]||'')+'|'+(p[ci.origem]||'')+'|'+(p[ci.destino]||'')+'|'+(p[ci.valor]||'');
-      const dup=AFs.find(f=>f.motId===(mo?mo.id:null)&&f.data===dataConv&&f.destino===(p[ci.destino]||'')&&String(f.valor)===String(parseFloat((p[ci.valor]||'0').replace(',','.'))));
       const dataConv=normalizarData(p[ci.data]||'');
-      CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:dataConv,origem:'CDV Recife',destino:p[ci.destino]||'',valor:parseFloat((p[ci.valor]||'0').replace(',','.')),status:(p[ci.status]||'pendente').toLowerCase(),tipo,duplicado:!!dup});
+      const destino=(p[ci.destino]||'').trim();
+      const valor=parseFloat((p[ci.valor]||'0').replace(',','.'));
+      const status=(p[ci.status]||'pendente').toLowerCase().trim();
+      const tipo=normalizarTipo(ci.tipo>=0&&p[ci.tipo]?p[ci.tipo]:'Entrega');
+      const dup=AFs.find(f=>f.motId===(mo?mo.id:null)&&f.data===dataConv&&f.destino===destino&&String(f.valor)===String(valor));
+      CSVf.push({ok:!!mo,nomeMot:nm,motId:mo?mo.id:null,data:dataConv,origem:'CDV Recife',destino,valor,status,tipo,duplicado:!!dup});
     }
     let h='<p style="font-size:13px;margin-bottom:8px;color:var(--text-sec)">'+CSVf.length+' registros'+(er?' — <span style="color:var(--red)">'+er+' nao encontrado(s)</span>':'')+'</p>';
     const dups=CSVf.filter(r=>r.duplicado).length;
