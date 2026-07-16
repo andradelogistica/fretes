@@ -453,9 +453,9 @@ async function initAdmin(){try{const s=await fns.getDocs(fns.collection(db,'moto
 
 function initQz(){
   popSel();
-  if(!document.getElementById('qz-mes').value){
+  if(!document.getElementById('qz-mes').value)
     document.getElementById('qz-mes').value=new Date().toISOString().slice(0,7);
-  }
+  qzSelecionados={};
   renderQz();
 }
 
@@ -464,10 +464,53 @@ function getQzDatas(){
   const q=document.getElementById('qz-q').value;
   if(!mes)return null;
   const[y,m]=mes.split('-');
-  const ultimoDia=new Date(parseInt(y),parseInt(m),0).getDate();
-  const de=mes+(q==='1'?'-01':'-16');
-  const ate=mes+(q==='1'?'-15':'-'+String(ultimoDia).padStart(2,'0'));
-  return{de,ate,mes,q,ultimoDia};
+  const ultimo=new Date(parseInt(y),parseInt(m),0).getDate();
+  return{
+    de:mes+(q==='1'?'-01':'-16'),
+    ate:mes+(q==='1'?'-15':'-'+String(ultimo).padStart(2,'0'))
+  };
+}
+
+let qzSelecionados={};
+
+function qzChkChange(){
+  // Chamado por QUALQUER checkbox de frete individual
+  const fid=this.dataset.frete;
+  qzSelecionados[fid]=this.checked;
+  // Atualizar o grupo
+  const mid=this.dataset.grupo;
+  const chkG=document.getElementById('chkg-'+mid);
+  if(chkG){
+    const todos=[...document.querySelectorAll('.chkf-item[data-grupo="'+mid+'"]')];
+    chkG.checked=todos.length>0&&todos.every(c=>c.checked);
+  }
+  atualizarBtnPagar();
+}
+
+function qzGrupoChange(){
+  // Chamado pelo checkbox do grupo
+  const mid=this.dataset.grupo;
+  const val=this.checked;
+  document.querySelectorAll('.chkf-item[data-grupo="'+mid+'"]').forEach(c=>{
+    c.checked=val;
+    qzSelecionados[c.dataset.frete]=val;
+  });
+  atualizarBtnPagar();
+}
+
+function marcarTodosCheck(val){
+  document.querySelectorAll('.chkf-item').forEach(c=>{
+    c.checked=val;
+    qzSelecionados[c.dataset.frete]=val;
+  });
+  document.querySelectorAll('.chkg-item').forEach(c=>c.checked=val);
+  atualizarBtnPagar();
+}
+
+function atualizarBtnPagar(){
+  const total=Object.values(qzSelecionados).filter(Boolean).length;
+  const btn=document.getElementById('btn-qz-pagar');
+  if(btn)btn.textContent='✓ Marcar '+total+' frete(s) como Pago';
 }
 
 function renderQz(){
@@ -477,92 +520,108 @@ function renderQz(){
   let fr=AFs.filter(f=>f.data>=dts.de&&f.data<=dts.ate);
   if(motId)fr=fr.filter(f=>f.motId===motId);
 
-  const pagos=fr.filter(f=>f.status==='pago');
   const pendentes=fr.filter(f=>f.status==='pendente');
-  const valorPend=pendentes.reduce((s,f)=>s+f.valor,0);
+  const pagos=fr.filter(f=>f.status==='pago');
 
   document.getElementById('qz-total-fr').textContent=fr.length;
   document.getElementById('qz-pagos').textContent=pagos.length;
   document.getElementById('qz-pend').textContent=pendentes.length;
-  document.getElementById('qz-valor-pend').textContent=R(valorPend);
+  document.getElementById('qz-valor-pend').textContent=R(pendentes.reduce((s,f)=>s+f.valor,0));
   document.getElementById('qz-resumo').style.display=fr.length?'block':'none';
 
+  // Inicializar selecionados: pendentes = true por padrão
+  pendentes.forEach(f=>{if(!(f.id in qzSelecionados))qzSelecionados[f.id]=true;});
+
   const el=document.getElementById('qz-tabela');
-  if(!fr.length){el.innerHTML='<p style="text-align:center;color:var(--text-sec);padding:1.5rem;font-size:13px">Nenhum frete neste período.</p>';return;}
+  if(!fr.length){
+    el.innerHTML='<p style="text-align:center;color:var(--text-sec);padding:1.5rem;font-size:13px">Nenhum frete neste período.</p>';
+    return;
+  }
 
   // Agrupar por motorista
   const grupos={};
   fr.forEach(f=>{
-    const mo=AMs.find(m=>m.id===f.motId);
-    const key=f.motId;
-    if(!grupos[key])grupos[key]={mo,fretes:[]};
-    grupos[key].fretes.push(f);
+    if(!grupos[f.motId])grupos[f.motId]={mo:AMs.find(m=>m.id===f.motId),fretes:[]};
+    grupos[f.motId].fretes.push(f);
   });
 
   let h='';
-  Object.values(grupos).sort((a,b)=>(a.mo?.nome||'').localeCompare(b.mo?.nome||'')).forEach(g=>{
-    const totPg=g.fretes.filter(f=>f.status==='pago').reduce((s,f)=>s+f.valor,0);
-    const totPd=g.fretes.filter(f=>f.status==='pendente').reduce((s,f)=>s+f.valor,0);
-    const nPend=g.fretes.filter(f=>f.status==='pendente').length;
-    h+='<div style="margin-bottom:1rem;border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">';
-    // Header do grupo
-    h+='<div style="background:var(--bg-sec);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
-    h+='<div style="display:flex;align-items:center;gap:10px">';
-    h+='<input type="checkbox" id="chk-grupo-'+g.mo?.id+'" onchange="toggleGrupo(\''+g.mo?.id+'\')" '+(nPend===0?'disabled':'')+' style="width:16px;height:16px;cursor:pointer" '+(nPend>0?'checked':'')+' >';
-    h+='<div><div style="font-size:13px;font-weight:500">'+(g.mo?g.mo.nome:'(removido)')+'</div>';
-    h+='<div style="font-size:11px;color:var(--text-sec)">'+(g.mo?g.mo.usuario:'')+'</div></div></div>';
-    h+='<div style="text-align:right;font-size:12px">';
-    if(totPd>0)h+='<div style="color:var(--amber-dark)">Pendente: <strong>'+R(totPd)+'</strong></div>';
-    if(totPg>0)h+='<div style="color:var(--green)">Pago: '+R(totPg)+'</div>';
-    h+='</div></div>';
-    // Fretes do grupo
-    h+='<div class="ox"><table style="font-size:12px"><thead><tr><th style="width:32px"><input type="checkbox" style="display:none"></th><th>Data</th><th>Tipo</th><th>Destino</th><th>Valor</th><th>Status</th></tr></thead><tbody>';
-    g.fretes.forEach(f=>{
-      const isPend=f.status==='pendente';
-      h+='<tr style="'+(isPend?'':'opacity:.5')+'">';
-      h+='<td><input type="checkbox" class="chk-frete" data-id="'+f.id+'" data-mot="'+f.motId+'" '+(isPend?'checked':'disabled')+' style="width:14px;height:14px;cursor:'+(isPend?'pointer':'default')+'" ></td>';
-      h+='<td style="white-space:nowrap">'+fd(f.data)+'</td>';
-      h+='<td>'+tipoBadge(f.tipo)+'</td>';
-      h+='<td>'+f.destino+'</td>';
-      h+='<td style="font-weight:500;white-space:nowrap">'+R(f.valor)+'</td>';
-      h+='<td><span class="badge '+(f.status==='pago'?'bok':'bpd')+'">'+(f.status==='pago'?'Pago':'Pendente')+'</span></td>';
-      h+='</tr>';
+  Object.values(grupos)
+    .sort((a,b)=>(a.mo?.nome||'').localeCompare(b.mo?.nome||''))
+    .forEach(g=>{
+      const mid=g.mo?g.mo.id:'sem-id';
+      const pendG=g.fretes.filter(f=>f.status==='pendente');
+      const totPd=pendG.reduce((s,f)=>s+f.valor,0);
+      const totPg=g.fretes.filter(f=>f.status==='pago').reduce((s,f)=>s+f.valor,0);
+      const todosSelG=pendG.length>0&&pendG.every(f=>qzSelecionados[f.id]);
+
+      h+='<div style="margin-bottom:1rem;border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">';
+
+      // Cabeçalho do grupo
+      h+='<div style="background:var(--bg-sec);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
+      h+='<div style="display:flex;align-items:center;gap:12px">';
+      if(pendG.length>0){
+        h+='<input type="checkbox" id="chkg-'+mid+'" class="chkg-item" data-grupo="'+mid+'"'
+          +' style="width:18px;height:18px;cursor:pointer;accent-color:#185FA5"'
+          +(todosSelG?' checked':'')+'>';
+      } else {
+        h+='<span style="color:var(--green);font-size:16px;width:18px;display:inline-block;text-align:center">✓</span>';
+      }
+      h+='<div>'
+        +'<div style="font-size:13px;font-weight:500">'+(g.mo?g.mo.nome:'Removido')+'</div>'
+        +'<div style="font-size:11px;color:var(--text-sec)">'+(g.mo?g.mo.usuario:'—')+'</div>'
+        +'</div></div>';
+      h+='<div style="font-size:12px;text-align:right">';
+      if(totPd>0)h+='<div style="color:var(--amber-dark)">Pendente: <strong>'+R(totPd)+'</strong></div>';
+      if(totPg>0)h+='<div style="color:var(--green)">Pago: '+R(totPg)+'</div>';
+      h+='</div></div>';
+
+      // Tabela de fretes
+      h+='<div class="ox"><table style="font-size:12px">'
+        +'<thead><tr>'
+        +'<th style="width:40px;text-align:center">Sel</th>'
+        +'<th>Data</th><th>Tipo</th><th>Destino</th><th>Valor</th><th>Status</th>'
+        +'</tr></thead><tbody>';
+
+      g.fretes.forEach(f=>{
+        const isPend=f.status==='pendente';
+        const sel=isPend&&qzSelecionados[f.id]===true;
+        h+='<tr style="opacity:'+(isPend?'1':'0.45')+'">';
+        if(isPend){
+          h+='<td style="text-align:center">'
+            +'<input type="checkbox" class="chkf-item" data-frete="'+f.id+'" data-grupo="'+mid+'"'
+            +' style="width:15px;height:15px;cursor:pointer;accent-color:#185FA5"'
+            +(sel?' checked':'')
+            +'></td>';
+        } else {
+          h+='<td style="text-align:center;color:var(--green);font-size:14px">✓</td>';
+        }
+        h+='<td style="white-space:nowrap">'+fd(f.data)+'</td>'
+          +'<td>'+tipoBadge(f.tipo)+'</td>'
+          +'<td>'+f.destino+'</td>'
+          +'<td style="font-weight:500;white-space:nowrap">'+R(f.valor)+'</td>'
+          +'<td><span class="badge '+(isPend?'bpd':'bok')+'">'+(isPend?'Pendente':'Pago')+'</span></td>'
+          +'</tr>';
+      });
+      h+='</tbody></table></div></div>';
     });
-    h+='</tbody></table></div></div>';
-  });
+
   el.innerHTML=h;
-}
 
-function toggleGrupo(motId){
-  const chkGrupo=document.getElementById('chk-grupo-'+motId);
-  document.querySelectorAll('.chk-frete[data-mot="'+motId+'"]').forEach(c=>{
-    if(!c.disabled)c.checked=chkGrupo.checked;
-  });
-}
+  // Anexar eventos DEPOIS de inserir no DOM
+  document.querySelectorAll('.chkf-item').forEach(c=>c.addEventListener('change',qzChkChange));
+  document.querySelectorAll('.chkg-item').forEach(c=>c.addEventListener('change',qzGrupoChange));
 
-function marcarTodosCheck(val){
-  document.querySelectorAll('.chk-frete:not(:disabled)').forEach(c=>c.checked=val);
-  // Atualizar checkboxes de grupo
-  const grupos={};
-  document.querySelectorAll('.chk-frete:not(:disabled)').forEach(c=>{
-    const mot=c.dataset.mot;
-    if(!grupos[mot])grupos[mot]=[];
-    grupos[mot].push(c.checked);
-  });
-  Object.entries(grupos).forEach(([mot,vals])=>{
-    const g=document.getElementById('chk-grupo-'+mot);
-    if(g)g.checked=vals.every(v=>v);
-  });
+  atualizarBtnPagar();
 }
 
 async function pagarQuinzena(){
-  const selecionados=[...document.querySelectorAll('.chk-frete:checked:not(:disabled)')].map(c=>c.dataset.id);
-  if(!selecionados.length){showA('qz-alert','Nenhum frete selecionado.','er');return;}
-  if(!confirm('Marcar '+selecionados.length+' frete(s) como PAGO? Essa ação não pode ser desfeita.'))return;
-
-  setBtn('btn-qz-pagar',true,'Marcando como Pago...');
+  const ids=Object.entries(qzSelecionados).filter(([,v])=>v).map(([k])=>k);
+  if(!ids.length){showA('qz-alert','Nenhum frete selecionado.','er');return;}
+  if(!confirm('Marcar '+ids.length+' frete(s) como PAGO?\n\nEssa ação não pode ser desfeita.'))return;
+  setBtn('btn-qz-pagar',true,'Aguarde...');
   let ok=0,fail=0;
-  for(const id of selecionados){
+  for(const id of ids){
     try{
       await fns.updateDoc(fns.doc(db,'fretes',id),{status:'pago'});
       const f=AFs.find(x=>x.id===id);
@@ -570,10 +629,12 @@ async function pagarQuinzena(){
       ok++;
     }catch(e){fail++;}
   }
-  setBtn('btn-qz-pagar',false,'✓ Marcar todos como Pago');
+  qzSelecionados={};
+  setBtn('btn-qz-pagar',false,'✓ Marcar como Pago');
   showA('qz-alert',ok+' frete(s) marcados como Pago!'+(fail?' ('+fail+' falharam)':''),'ok');
   renderQz();
 }
+
 
 function filtrarPlaca(){
   const busca=document.getElementById('lm-busca').value.toUpperCase();
